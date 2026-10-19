@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Material List</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding-top: 60px;
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start; 
+    gap: 15px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+.product-list {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.product-item {
+    background-color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: darkred;
+}
+.add-btn{
+
+    background-color: black;
+    color: white;
+
+    border: none;
+    padding: 10px 20px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    display: block;
+    margin: 20px auto;
+}
+table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: white; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #333; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+
+<button onclick="location.href='stpd.html'">
+Furniture list
+</button>
+
+<button onclick="location.href='strp.html'">
+order list
+</button>
+
+<button onclick="location.href='mt.html'">
+Material list
+</button>
+<button onclick="location.href='report.html'">
+Report
+</button>
+
+<button onclick="location.href='../login/login_st.html'">
+Log out
+</button>
+
+
+</div>
+<button class="add-btn"
+onclick="location.href='addmt.html'">+ Add Material
+
+</button>
+<h1 style="text-align:center; margin-top:60px;">Material List</h1>
+
+<div class="product-list" id="material-list"></div>
+<div class="product-list">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Material Name</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                
+            </tr>
+        </thead>
+        <tbody id="material-table-body">
+            </tbody>
+    </table>
+</div>
+<script>
+function fetchMaterials() {
+    fetch('../php/mt.php')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("material-table-body");
+            tbody.innerHTML = "";
+            
+            data.forEach(item => {
+                let row = `<tr>
+                    <td>${item.mid}</td>
+                    <td>${item.mname}</td>
+                    <td>${item.mqty}</td>
+                    <td>${item.munit}</td>
+                    
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        });
+}
+
+
+
+
+fetchMaterials();
+</script>
+
+</body>
+</html>

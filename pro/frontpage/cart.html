@@ -1,0 +1,428 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Shopping Cart</title>
+
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column; 
+    margin: 0;
+    padding-top: 60px; 
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.sp {
+    display: flex;
+    flex-wrap: wrap;   
+    justify-content: center;
+    gap: 20px; 
+}
+	
+.pd img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pd h3 {
+    margin-top: 10px;
+    background-color: white;
+    padding: 5px;            
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    position: fixed; 
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+
+.product-container {
+    display: flex;  
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    background-color: rgba(255,255,255,0.9);
+    margin: 50px auto;
+    padding: 30px;
+    width: 70%;
+    border-radius: 12px;
+}
+
+.product-img img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.product-info {
+    max-width: 400px;
+}
+
+.product-info h1 {
+    margin-top: 0;
+}
+
+.price {
+    color: red;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.addbt {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.addbt:hover {
+    background-color: #444;
+}
+
+.clear-btn {
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 6px 12px;  
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;   
+    width: fit-content;  
+    margin: 10px auto;   
+}
+
+.clear-btn:hover {
+    background-color: #444;
+}
+
+.cart-title {
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;   
+    margin: 20px auto;   
+}
+
+.total {
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;   
+    margin: 20px auto;   
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.cart-item {
+    background-color: white;
+    margin: 10px auto;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.cart-item button {
+    margin-left: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background-color: darkred;
+}
+
+.db-info-box {
+    background-color: #e9ecef;
+    padding: 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: #495057;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <button onclick="location.href='../frontpage/fp.html'">furnitures</button>
+    </div>
+    <div class="nav-right">
+        <button onclick="location.href='../frontpage/cart.html'">Shopping cart</button>
+        <button onclick="location.href='../frontpage/rp.html'">Order record</button>
+        <button onclick="location.href='../frontpage/setting.html'">Settings</button>
+        <button onclick="location.href='../login/login.html'">Log out</button>
+    </div>
+</div>
+
+<h1 class="cart-title">Shopping Cart</h1>
+
+<div id="cart-list"></div>
+
+<div class="total">
+    Total: $<span id="total">0</span>
+</div>
+
+<div class="order-info" style="background-color:white; padding: 10px 20px; border-radius:8px; width:fit-content; margin: 10px auto;">
+    
+    <div class="db-info-box"><strong>Logged in Customer ID (cid):</strong> <span id="db-cid">Loading...</span></div>
+
+    <label for="customer-name">Customer Name:</label><br>
+    <input type="text" id="customer-name" readonly style="width:300px; padding:5px; margin:5px 0;"><br>
+    
+    <label for="customer-phone">Phone number:</label><br>
+    <input type="text" id="customer-phone" readonly style="width:150px; padding:5px; margin:5px 0;"><br>
+    
+    <label for="address">Delivery Address:</label><br>  
+    <input type="text" id="address" name="address" placeholder="Enter your address" style="width:300px; padding:5px; margin:5px 0;"><br>
+
+  <br>  <label for="delivery-date">Delivery Date & Time:</label><br>
+<input type="datetime-local" id="delivery-date" name="delivery-date" style="width:220px; padding:5px; margin:5px 0;">
+</div>
+
+<button id="pay-btn" class="clear-btn">Pay</button>
+
+<button class="clear-btn" onclick="clearCart()">
+    Clear Cart
+</button>
+
+<script>
+let currentCustomer = {};
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+const now = new Date();
+  
+    const minStr = now.toISOString().slice(0, 16);
+    document.getElementById("delivery-date").min = minStr;
+    fetch('../php/cart.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.log("DB User Error:", data.error);
+                if(data.error === "Not logged in") {
+                    alert("Please log in first.");
+                    location.href = '../login/login.html';
+                }
+                return;
+            }
+            
+         
+            currentCustomer = data;
+            
+            document.getElementById("db-cid").textContent = data.cid;
+            document.getElementById("customer-name").value = data.cname;
+            document.getElementById("customer-phone").value = data.ctel;
+            
+            
+            const addressInput = document.getElementById("address");
+            if (!addressInput.value && data.caddr) {
+                addressInput.value = data.caddr;
+                updatePayBtn();
+            }
+        })
+        .catch(error => console.error("Error fetching cart user info:", error));
+});
+
+
+let list = document.getElementById("cart-list");
+let totalEl = document.getElementById("total");
+let addressInput = document.getElementById("address");
+let dateInput = document.getElementById("delivery-date");
+let payBtn = document.getElementById("pay-btn");
+let customerNameInput = document.getElementById("customer-name");
+let customerPhoneInput = document.getElementById("customer-phone");
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function renderCart() {
+    list.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        let div = document.createElement("div");
+        div.className = "cart-item";
+        
+     
+        const fid = item.fid || item.id || '';
+        const fname = item.fname || item.name || '';
+        const fprice = parseFloat(item.fprice || item.price || 0);
+        const oqty = parseInt(item.oqty || item.quantity || 1);
+
+        div.innerHTML = `
+            #${fid} - ${fname} - $${fprice.toFixed(2)} x ${oqty}
+            <button onclick="removeItem(${index})">Delete</button>
+        `;
+        list.appendChild(div);
+        total += fprice * oqty;
+    });
+
+    totalEl.textContent = total.toFixed(2);
+}
+renderCart();
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+    updatePayBtn();
+}
+
+function clearCart() {
+    localStorage.removeItem("cart");
+    cart = [];
+    renderCart();
+    updatePayBtn();
+}
+
+function updatePayBtn() {
+    payBtn.disabled = !(cart.length > 0 && addressInput.value && dateInput.value);
+    payBtn.style.cursor = payBtn.disabled ? "not-allowed" : "pointer";
+    payBtn.style.backgroundColor = payBtn.disabled ? "#ccc" : "black";
+    payBtn.style.color = payBtn.disabled ? "#666" : "white";
+}
+addressInput.addEventListener('input', updatePayBtn);
+dateInput.addEventListener('input', updatePayBtn);
+updatePayBtn();
+
+
+payBtn.addEventListener('click', function() {
+        if(cart.length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+        if(!addressInput.value || !dateInput.value) {
+            alert("Please enter delivery address and date.");
+            return;
+        }
+	const nowStr = new Date().toISOString().slice(0, 16);
+    if (dateInput.value < nowStr) {
+        alert("Delivery date and time cannot be earlier than the current time.");
+        return;
+    }
+
+     
+        const mergedCart = [];
+        let totalAmount = 0;
+
+        cart.forEach(item => {
+            const fid = item.fid || item.id;
+            const price = parseFloat(item.fprice || item.price || 0);
+            const qty = parseInt(item.oqty || item.quantity || 1);
+
+        
+            const existingItem = mergedCart.find(cartItem => cartItem.fid === fid);
+
+            if (existingItem) {
+            
+                existingItem.oqty += qty;
+            } else {
+     
+                mergedCart.push({
+                    fid: fid,
+                    oqty: qty,
+                    price: price
+                });
+            }
+            totalAmount += price * qty;
+        });
+
+  
+        const orderItems = mergedCart.map(item => ({
+            fid: item.fid,
+            oqty: item.oqty
+        }));
+
+       const rawDateTime = dateInput.value; 
+    const formattedDateTime = rawDateTime.replace('T', ' ') + ':00'; 
+
+    const orderData = {
+        totalAmount: totalAmount,
+        address: addressInput.value,
+        deliveryDate: formattedDateTime, 
+        items: orderItems
+    };
+
+  
+        fetch('../php/cart_pay.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert("Order #" + data.oid + " created successfully!");
+            
+                localStorage.removeItem("cart");
+       
+                location.href = "rp.html";
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Payment error:", error);
+            alert("An error occurred while processing the payment.");
+        });
+    });
+</script>
+
+</body>
+</html>

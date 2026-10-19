@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>order record</title>
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column; 
+
+    margin: 0;
+    padding-top: 60px; 
+}
+
+
+input {width: 90%;padding: 8px;
+    margin-top: 5px;
+}
+
+.sp{
+    display: flex;
+    flex-wrap: wrap;  
+    justify-content: center;
+    gap: 20px; } 
+	
+.pd img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pd h3 {
+    margin-top: 10px;
+	  background-color: white;
+    padding: 5px;           
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+
+    position: fixed; 
+    top: 0;
+    width: 100%;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+.pd a {
+    text-decoration: none; 
+    color: black;        
+}
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.order-table th, .order-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.order-table th {
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+}
+
+.sort-controls {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sort-controls select, .sort-controls button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+<div class="navbar">
+<div class="nav-left">
+    <button onclick="location.href='../frontpage/fp.html'">furnitures list</button>
+   
+   
+</div>
+
+    <div class="nav-right">
+        <button onclick="location.href='../frontpage/cart.html'">Shopping cart</button>
+		<button onclick="location.href='../frontpage/rp.html'">Order record</button>
+		<button onclick="location.href='../frontpage/setting.html'">Settings</button>
+       <button onclick="location.href='../login/login.html'">Log out</button>
+	   
+    </div></div>
+
+
+<h1>Order Records</h1>
+
+<div class="sort-controls">
+    Sort by: 
+    <select id="sortColumn">
+        <option value="orderId">Order ID</option>
+        <option value="orderDate">Order Date</option>
+        <option value="furnitureId">Furniture ID</option>
+        <option value="quantity">Quantity</option>
+        <option value="totalAmount">Total Amount</option>
+        <option value="customerId">Customer ID</option>
+        <option value="deliveryDate">Delivery Date</option>
+        <option value="status">Order Status</option>
+    </select>
+
+    <button id="toggleSort">Ascending</button>
+</div>
+
+<table class="order-table" id="orderTable">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Furniture ID</th>
+            <th>Quantity</th>
+            <th>Total Amount</th>
+            <th>Customer ID</th>
+            <th>Delivery Date</th>
+            <th>Status</th>
+			 <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+       
+    </tbody>
+</table>
+<div id="order-list"></div>
+<script>
+let currentSort = "oid";
+let currentOrder = "DESC";
+
+function fetchOrders() {
+    fetch(`../php/rp.php?sort=${currentSort}&order=${currentOrder}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector("#orderTable tbody");
+            tbody.innerHTML = "";
+            
+            data.forEach(order => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.oid}</td>
+                    <td>${order.odate}</td>
+                    <td>${order.fid}</td>
+                    <td>${order.oqty}</td>
+                    <td>$${parseFloat(order.ototalamount).toFixed(2)}</td>
+                    <td>${order.cid}</td>
+                    <td>${order.odeliverydate}</td>
+                    <td>${order.ostatus == 1 ? 'Open' : 'Completed'}</td>
+                    <td><button onclick="confirmDelete(${order.oid}, '${order.odeliverydate}')">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+
+function confirmDelete(oid, deliveryDate) {
+    const today = new Date();
+    const dDate = new Date(deliveryDate);
+    const timeDiff = dDate - today;
+    const dayDiff = timeDiff / (1000 * 3600 * 24);
+
+    if (dayDiff < 2) {
+        alert("Orders can only be deleted at least 2 days before the delivery date.");
+        return;
+    }
+
+    if (confirm("Are you sure you want to delete this order?")) {
+        fetch('../php/delete_order.php', {
+            method: 'POST',
+            body: JSON.stringify({ oid: oid }),
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                alert("Order deleted and stock updated.");
+                fetchOrders();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(err => console.error("Error:", err));
+    }
+}
+
+document.getElementById("sortColumn").addEventListener("change", (e) => {
+    currentSort = e.target.value;
+    fetchOrders();
+});
+
+document.getElementById("toggleSort").addEventListener("click", () => {
+    currentOrder = (currentOrder === "ASC") ? "DESC" : "ASC";
+    document.getElementById("toggleSort").textContent = currentOrder;
+    fetchOrders();
+});
+
+fetchOrders();
+</script>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>furnitures</title>
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column; 
+    margin: 0;
+    padding-top: 60px; 
+    align-items: center;
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+
+.furniture-table {
+    width: 85%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.furniture-table th, .furniture-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.furniture-table th {
+    background-color: #333;
+    color: white;
+}
+
+.pd img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.sp {
+    display: flex;
+    flex-wrap: wrap;   
+    justify-content: center;
+    gap: 20px; 
+}
+
+.pd h3 {
+    margin-top: 10px;
+    background-color: white;
+    padding: 5px;            
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    position: fixed; 
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+
+.pd a {
+    text-decoration: none; 
+    color: black;        
+}
+
+
+.Detail-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.Detail-btn:hover {
+    background-color: #0056b3;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <button disabled class="active-btn">furnitures list</button>
+    </div>
+    <div class="nav-right">
+        <button onclick="location.href='../frontpage/cart.html'">Shopping cart</button>
+        <button onclick="location.href='../frontpage/rp.html'">Order record</button>
+        <button onclick="location.href='../frontpage/setting.html'">Settings</button>
+        <button onclick="location.href='../login/login.html'">Log out</button>
+    </div>
+</div>
+
+<h1 align="center">Furnitures List</h1>
+
+<table class="furniture-table">
+    <thead>
+        <tr>
+            <th>Furniture Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="furniture-tbody">
+        </tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    
+    fetch('../php/fp.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            const tbody = document.getElementById('furniture-tbody');
+            tbody.innerHTML = ''; 
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // photo
+                const imagePath = `../image/${item.fid}.png`; 
+
+                row.innerHTML = `
+                    <td class="pd"><img src="${imagePath}" alt="${item.fname}" onerror="this.src='placeholder.png'"></td>
+                    <td>${item.fname}</td>
+                    <td>$${parseFloat(item.fprice).toFixed(2)}</td>
+                    <td>
+                        <button class="Detail-btn" onclick="viewDetail(${item.fid})">detail</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching furniture data:', error));
+});
+
+
+function viewDetail(fid) {
+    location.href = `detail.html?fid=${fid}`;
+}
+</script>
+
+</body>
+</html>

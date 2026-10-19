@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>report</title>
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column; 
+
+    margin: 0;
+    padding-top: 60px; 
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+
+    display: flex;
+    justify-content: space-between;
+
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+/* Title */
+
+.title{
+    background-color: white;
+
+    padding: 10px 20px;
+    border-radius: 8px;
+
+    width: fit-content;
+    margin: 20px auto;
+}
+
+/* Product List */
+
+.product-list{
+    width: 80%;
+    margin: auto;
+}
+
+.product-item{
+
+    background-color: white;
+
+    padding: 15px;
+    margin: 15px 0;
+
+    border-radius: 10px;
+
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Image */
+
+.product-item img{
+
+    width: 100px;
+    height: 100px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+}
+
+/* Info */
+
+.product-info{
+    flex-grow: 1;
+}
+
+/* Buttons */
+
+.delete-btn{
+
+    background-color: red;
+    color: white;
+
+    border: none;
+    padding: 6px 10px;
+
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover{
+    background-color: darkred;
+}
+
+.add-btn{
+
+    background-color: black;
+    color: white;
+
+    border: none;
+    padding: 10px 20px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    display: block;
+    margin: 20px auto;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+.report-table th, .report-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.report-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+.report-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.report-container{
+    background-color: white;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+<button onclick="location.href='stpd.html'">
+Furniture list
+</button>
+
+<button onclick="location.href='strp.html'">
+order list
+</button>
+
+<button onclick="location.href='mt.html'">
+Material list
+</button>
+<button onclick="location.href='report.html'">
+Report
+</button>
+
+<button onclick="location.href='../login/login_st.html'">
+Log out
+</button>
+
+</div>
+
+<div class="report-container">
+    <h1>Material Management Report</h1>  
+    <div id="report-summary">
+        </div>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Furniture Image</th>
+                <th>Furniture Name</th>
+                <th>Quantity</th>
+                <th>Total Sales ($)</th>
+            </tr>
+        </thead>
+        <tbody id="report-body">
+            </tbody>
+    </table>
+</div>
+
+<script>
+function generateReport() {
+    fetch('../php/report.php')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("report-body");
+            tbody.innerHTML = "";
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5'>No data</td></tr>";
+                return;
+            }
+            
+            data.forEach(item => {
+                let row = `<tr>
+                    <td>${item.oid}</td>
+                    <td><img src="../image/${item.fid}.png" class="report-img" alt="Furniture Image"></td>
+                    <td>${item.fname}</td>
+                    <td>${item.oqty}</td>
+                    <td>$ ${parseFloat(item.totalSales).toFixed(2)}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        })
+        .catch(err => console.error("error:", err));
+}
+
+
+window.onload = generateReport;
+
+
+document.querySelector('button').addEventListener('click', generateReport);
+</script>
+
+</body>
+</html>

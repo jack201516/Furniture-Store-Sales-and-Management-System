@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Furniture Detail</title>
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column; 
+    margin: 0;
+    padding-top: 60px; 
+}
+
+input {
+    width: 90%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.sp {
+    display: flex;
+    flex-wrap: wrap;   
+    justify-content: center;
+    gap: 20px; 
+}
+	
+.pd img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pd h3 {
+    margin-top: 10px;
+    background-color: white;
+    padding: 5px;            
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    position: fixed; 
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+
+.product-container {
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    background-color: rgba(255,255,255,0.9);
+    margin: 50px auto;
+    padding: 30px;
+    width: 70%;
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.product-img img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.product-info {
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-info h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.fid-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.price {
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.desc {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+}
+
+
+.stock-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quantity-container label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 6px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.addbt {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    align-self: flex-start;
+}
+
+.addbt:hover {
+    background-color: #444;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <button onclick="location.href='../frontpage/fp.html'">furnitures list</button>
+    </div>
+    <div class="nav-right">
+        <button onclick="location.href='../frontpage/cart.html'">Shopping cart</button>
+        <button onclick="location.href='../frontpage/rp.html'">Order record</button>
+        <button onclick="location.href='../frontpage/setting.html'">Settings</button>
+        <button onclick="location.href='../login/login.html'">Log out</button>
+    </div>
+</div>
+
+<div class="product-container" id="product-detail">
+    <p>Loading furniture details...</p>
+</div>
+
+<script>
+
+let currentProduct = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const fid = urlParams.get('fid');
+
+    if (!fid) {
+        document.getElementById('product-detail').innerHTML = '<p>Error: No Furniture ID specified.</p>';
+        return;
+    }
+
+   
+    fetch(`../php/detail.php?fid=${fid}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('product-detail').innerHTML = `<p>${data.error}</p>`;
+                return;
+            }
+
+            
+            currentProduct = data;
+
+            
+            const container = document.getElementById('product-detail');
+            container.innerHTML = `
+                <div class="product-img">
+                    <img src="../image/${data.fid}.png" alt="${data.fname}" onerror="this.src='placeholder.png'">
+                </div>
+                <div class="product-info">
+                    <div class="fid-text">Item ID: #${data.fid}</div>
+                    <h1>${data.fname}</h1>
+                    <div class="price">$${parseFloat(data.fprice).toFixed(2)}</div>
+                    <div class="desc">${data.fdesc}</div>
+                    
+                    <div class="stock-text">Available Stock:  ${data.stock}</div>
+
+                    <div class="quantity-container">
+                        <label for="pqty">Quantity:</label>
+                        <input type="number" id="pqty" class="quantity-input" value="${data.stock > 0 ? 1 : 0}" min="${data.stock > 0 ? 1 : 0}" max="${data.stock}">
+                    </div>
+
+                    <button class="addbt" ${data.stock <= 0 ? 'disabled style="background-color:#ccc; cursor:not-allowed;"' : ''} onclick="addToCart()">Add to Cart</button>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching detail:', error);
+            document.getElementById('product-detail').innerHTML = '<p>Failed to load details.</p>';
+        });
+});
+
+function addToCart() {
+    if (!currentProduct) return;
+
+    const quantityInput = document.getElementById('pqty');
+    const selectedQuantity = parseInt(quantityInput.value) || 0;
+
+  
+    if (selectedQuantity <= 0 || selectedQuantity > currentProduct.stock) {
+        alert("Invalid quantity selected.");
+        return;
+    }
+
+   
+    let product = {
+        fid: currentProduct.fid,
+        fname: currentProduct.fname,
+        fprice: currentProduct.fprice,
+        oqty: selectedQuantity
+    };
+
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  
+    cart.push(product);
+
+  
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    location.href = "../frontpage/fp.html";
+}
+</script>
+
+</body>
+</html>

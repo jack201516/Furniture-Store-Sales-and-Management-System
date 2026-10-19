@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Staff Order Record</title>
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    padding-top: 60px;
+    background-color: #f5f5f5;
+}
+
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    display: flex;
+    gap: 15px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+
+.title{
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+/* 訂單列表 */
+.order-list{
+    width: 90%;
+    margin: 20px auto;
+}
+
+.order-item{
+    background-color: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+}
+
+.order-item img{
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.order-info{
+    margin-top: 10px;
+}
+
+.order-info b{
+    display: inline-block;
+    width: 160px;
+}
+
+.update-btn{
+    background-color: black;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.update-btn:hover{
+    background-color: #444;
+}
+
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <button onclick="location.href='stpd.html'">
+Furniture list
+</button>
+
+<button onclick="location.href='strp.html'">
+order list
+</button>
+
+<button onclick="location.href='mt.html'">
+Material list
+</button>
+<button onclick="location.href='report.html'">
+Report
+</button>
+
+<button onclick="location.href='../login/login_st.html'">
+Log out
+</button>
+
+</div>
+
+<h1 class="title">Staff Order Record</h1>
+
+<div class="order-list" id="order-list"></div>
+
+<script>
+function fetchOrders() {
+    fetch('../php/strp.php')
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById("order-list");
+            list.innerHTML = "";
+          data.forEach(order => {
+    
+    let matHtml = order.materials.map(m => 
+        `<li>${m.mname}: Used ${m.usedQty}, Stock: ${m.mqty} ${m.munit}</li>`
+    ).join("");
+
+   list.innerHTML += `
+    <div class="order-item">
+        <p><b>Order ID:</b> ${order.oid} | <b>Date:</b> ${order.odate}</p>
+        <p><b>Customer:</b> ${order.cname || 'N/A'} (${order.ctel || 'N/A'})</p>
+        <p><b>Delivery:</b> ${order.odeliveraddress} on ${order.odeliverydate}</p>
+        <p><b>Furniture:</b> ${order.fname} (ID: ${order.fid})</p>
+        
+        <p>
+            <b>Quantity:</b> 
+            <input type="number" id="qty-${order.oid}" value="${order.oqty || 1}">
+            
+            <b>Status:</b> 
+           <select id="status-${order.oid}">
+    <option value="1" ${order.ostatus==1 ? 'selected' : ''}>Open</option>
+    <option value="2" ${order.ostatus==2 ? 'selected' : ''}>Processing</option>
+    <option value="3" ${order.ostatus==3 ? 'selected' : ''}>Approved</option>
+    <option value="4" ${order.ostatus==4 ? 'selected' : ''}>Pending delivery</option>
+    <option value="5" ${order.ostatus==5 ? 'selected' : ''}>Completed</option>
+    <option value="0" ${order.ostatus==0 ? 'selected' : ''}>Rejected</option>
+</select>
+            
+            <button class="update-btn" onclick="updateOrder(${order.oid})">Update Order</button>
+        </p>
+        
+        <p><b>Materials Used:</b><ul>${matHtml}</ul></p>
+    </div>
+`;
+});
+        });
+}
+
+function updateOrder(oid) {
+    const oqty = document.getElementById(`qty-${oid}`).value;
+    const ostatus = document.getElementById(`status-${oid}`).value;
+    
+    fetch('../php/update_order.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ oid, oqty, ostatus })
+    }).then(res => res.json()).then(data => alert("Updated successfully!"));
+}
+fetchOrders();
+</script>
+
+</body>
+</html>

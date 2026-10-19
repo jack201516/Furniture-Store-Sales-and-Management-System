@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>setting</title>
+<style>
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column; 
+
+    margin: 0;
+    padding-top: 60px; 
+}
+
+
+input {width: 90%;padding: 8px;
+    margin-top: 5px;
+}
+
+.sp{
+    display: flex;
+    flex-wrap: wrap;  
+    justify-content: center;
+    gap: 20px; } 
+	
+.pd img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pd h3 {
+    margin-top: 10px;
+	  background-color: white;
+    padding: 5px;           
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+
+    position: fixed; 
+    top: 0;
+    width: 100%;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+.pd a {
+    text-decoration: none; 
+    color: black;        
+}
+.settings-form {
+    background-color: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.settings-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.settings-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.settings-form input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.settings-form button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: black;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.settings-form button:hover {
+    background-color: #444;
+}
+
+</style>
+</head>
+
+<body>
+<div class="navbar">
+<div class="nav-left">
+    <button onclick="location.href='../frontpage/fp.html'">furnitures list</button>
+   
+</div>
+
+    <div class="nav-right">
+        <button onclick="location.href='../frontpage/cart.html'">Shopping cart</button>
+		<button onclick="location.href='../frontpage/rp.html'">Order record</button>
+		<button onclick="location.href='../frontpage/setting.html'">Settings</button>
+       <button onclick="location.href='../login/login.html'">Log out</button>
+	   
+    </div></div>
+<div class="settings-form">
+    <h1>Account Settings</h1>
+    
+ <form id="settings-form">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" value="John Doe" readonly style>
+
+    <label for="contact">Contact Number</label>
+    <input type="text" id="contact" name="contact" value="12345678">
+
+    <label for="address">Customer Address</label>
+    <input type="text" id="address" name="address" value="123 Street">
+	<label for="password">Password</label> <input type="password" id="password" name="password" value="123456">
+
+
+
+    <button type="submit">Save Changes</button>
+	
+</form>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('../php/cart.php') 
+        .then(res => res.json())
+        .then(data => {
+            if (data.cid) {
+                document.getElementById('name').value = data.cname;
+                document.getElementById('contact').value = data.ctel;
+                document.getElementById('address').value = data.caddr;
+                
+            }
+        });
+});
+
+
+document.getElementById('settings-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const updateData = {
+        password: document.getElementById('password').value,
+        contact: document.getElementById('contact').value,
+        address: document.getElementById('address').value
+    };
+
+    fetch('../php/update_profile.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert("Profile updated successfully!");
+        } else {
+            alert("Update failed: " + data.message);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+});
+</script>
+
+
+
+</body>
+</html>

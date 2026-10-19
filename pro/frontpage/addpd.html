@@ -1,0 +1,316 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Add Product</title>
+
+<style>
+
+body { 
+    background-image: url("bg.PNG");
+    background-attachment: fixed; 
+    background-position: center;
+    background-size: cover;
+
+    display: flex;
+    flex-direction: column; 
+
+    margin: 0;
+    padding-top: 60px; 
+}
+
+
+input {width: 90%;padding: 8px;
+    margin-top: 5px;
+}
+
+.sp{
+    display: flex;
+    flex-wrap: wrap;  
+    justify-content: center;
+    gap: 20px; } 
+	
+.pd img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.pd h3 {
+    margin-top: 10px;
+	  background-color: white;
+    padding: 5px;           
+    border-radius: 5px;  
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+
+    position: fixed; 
+    top: 0;
+    width: 100%;
+}
+
+.nav-left,
+.nav-right {
+    display: flex;
+    gap: 15px;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.navbar button:hover {
+    background-color: #ddd;
+}
+.active-btn {
+    background-color: black;  
+    color: red;
+    cursor: not-allowed;    
+}
+.pd a {
+    text-decoration: none; 
+    color: black;        
+}
+
+body {
+    background-color: #f5f5f5;
+    font-family: Arial;
+    margin: 0;
+    padding-top: 60px;
+}
+
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.navbar button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container {
+    background-color: white;
+    width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+button.add-btn {
+    background-color: black;
+    color: white;
+    padding: 10px;
+    border: none;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button.add-btn:hover {
+    background-color: #444;
+}
+
+.product-list {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.product-item {
+    background-color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+
+.container{
+    width: 500px;
+    margin: 40px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+input, textarea{
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+}
+
+button{
+    background-color: grey;
+    color: black;
+    padding: 10px;
+    border: none;
+    width: 100%;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.product-list{
+    width: 80%;
+    margin: 20px auto;
+}
+
+.product-item{
+    background-color: white;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+<div class="nav-left">
+    <button onclick="location.href='../frontpage/stpd.html'">back</button>
+    
+  
+</div>
+
+    <div class="nav-right">
+        
+		<button onclick="location.href='../frontpage/rp.html'">Order record</button>
+		<button onclick="location.href='../frontpage/setting.html'">Settings</button>
+       <button onclick="location.href='../login/login.html'">Log out</button>
+	   
+    </div></div>
+
+
+<div class="container">
+
+<h2>Add Furniture Item</h2>
+
+
+
+<label>Furniture Name</label>
+<input type="text" id="fName">
+
+<label>Furniture Description</label>
+<textarea id="fDesc"></textarea>
+
+
+
+<label>Price per Furniture ($)</label>
+<input type="number" id="fPrice">
+
+<div id="materials-container">
+    <div class="material-row">
+        <label>Material ID</label>
+        <input type="text" name="mIds[]">
+        <label>Material Quantity</label>
+        <input type="number" name="mQtys[]">
+    </div>
+</div>
+<button type="button" onclick="addMaterialRow()">+ Add another material</button>
+
+
+
+
+<button onclick="addFurniture()">
+Add Furniture
+</button>
+
+</div>
+
+<div class="product-list" id="furniture-list"></div>
+
+<script>
+
+function addFurniture() {
+    const furnitureData = {
+        fname: document.getElementById("fName").value.trim(),
+        fdesc: document.getElementById("fDesc").value.trim(),
+        fprice: document.getElementById("fPrice").value,
+        mid: document.getElementById("mId").value.trim(),
+        mqty: document.getElementById("mQty").value
+    };
+
+    if(furnitureData.fname === "" || furnitureData.fprice <= 0 || furnitureData.mqty <= 0) {
+        alert("Please fill all fields correctly!");
+        return;
+    }
+
+    fetch('../php/addpd.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(furnitureData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === 'success') {
+            alert("Furniture added successfully!");
+          
+            document.getElementById("fName").value = "";
+            document.getElementById("fDesc").value = "";
+            document.getElementById("fImage").value = "";
+            document.getElementById("fPrice").value = "";
+            document.getElementById("mId").value = "";
+            document.getElementById("mQty").value = "";
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
+function addMaterialRow() {
+    const container = document.getElementById('materials-container');
+    const row = document.createElement('div');
+    row.className = 'material-row';
+    row.innerHTML = `
+        <label>Material ID</label> <input type="text" name="mIds[]">
+        <label>Material Quantity</label> <input type="number" name="mQtys[]">
+    `;
+    container.appendChild(row);
+}
+
+function addFurniture() {
+  
+    const mIds = Array.from(document.querySelectorAll('input[name="mIds[]"]')).map(i => i.value);
+    const mQtys = Array.from(document.querySelectorAll('input[name="mQtys[]"]')).map(i => i.value);
+
+    const furnitureData = {
+        fname: document.getElementById("fName").value.trim(),
+        fdesc: document.getElementById("fDesc").value.trim(),
+        fprice: document.getElementById("fPrice").value,
+        materials: mIds.map((id, index) => ({ mid: id, qty: mQtys[index] }))
+    };
+
+    fetch('../php/addpd.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(furnitureData)
+    }).then(res => res.json()).then(data => {
+        if(data.status === 'success') alert("Added successfully!");
+    });
+}
+</script>
+
+</body>
+</html>
